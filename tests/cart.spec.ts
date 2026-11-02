@@ -1,36 +1,42 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from '../src/pages/LoginPage';
-import { InventoryPage } from '../src/pages/InventoryPage';
-import { CartPage } from '../src/pages/CartPage';
+import { LoginPage } from '../src/pages/LoginPage/LoginPage';
+import { InventoryPage } from '../src/pages/InventoryPage/InventoryPage';
+import { CartPage } from '../src/pages/CartPage/CartPage';
+import { ProductComponent } from '../src/pages/Components/ProductComponentPage';
 import { users, passwords } from '../src/constants/userData';
 
 test('Cart shows the same price as the catalog', async ({ page }) => {
   const loginPage = new LoginPage(page);
   const inventoryPage = new InventoryPage(page);
-  const cartPage = new CartPage(page);
+  const productComponent = new ProductComponent(page);
   const title = 'Sauce Labs Bolt T-Shirt';
 
   await page.goto('');
   await loginPage.login(users.standard, passwords.valid);
-  const catalogPrice = await inventoryPage.getPriceByTitle(title).innerText();
-  await inventoryPage.addToCartByTitle(title);
+  const catalogPrice = await productComponent.locators
+    .getPriceLocatorByTitle(title)
+    .innerText();
+  await productComponent.addToCartByTitle(title);
 
   await inventoryPage.openCart();
-  await expect(cartPage.getPriceByTitle(title)).toHaveText(catalogPrice);
+  await expect(
+    productComponent.locators.getPriceLocatorByTitle(title),
+  ).toHaveText(catalogPrice);
 });
 
 test('Return from cart to catalog', async ({ page }) => {
   const loginPage = new LoginPage(page);
   const inventoryPage = new InventoryPage(page);
   const cartPage = new CartPage(page);
+  const productComponent = new ProductComponent(page);
   const title = 'Sauce Labs Bike Light';
 
   await page.goto('');
   await loginPage.login(users.standard, passwords.valid);
-  await inventoryPage.addToCartByTitle(title);
+  await productComponent.addToCartByTitle(title);
   await inventoryPage.openCart();
   await cartPage.continueShopping();
 
-  await expect(inventoryPage.inventoryContainer).toBeVisible();
-  await expect(inventoryPage.cartBadge).toHaveCount(1);
+  await expect(inventoryPage.locators.inventoryContainer).toBeVisible();
+  await expect(inventoryPage.locators.cartBadge).toHaveCount(1);
 });

@@ -1,7 +1,7 @@
 import { Locator } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { BaseLocator } from '../BaseLocator';
 
-export class CheckoutCompletePage extends BasePage {
+export class CheckoutCompletePageLocators extends BaseLocator {
   readonly completeContainer: Locator = this.page.getByTestId(
     'checkout-complete-container',
   );
