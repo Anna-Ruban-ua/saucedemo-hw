@@ -4,23 +4,26 @@ import { InventoryPage } from '../src/pages/InventoryPage/InventoryPage';
 import { CartPage } from '../src/pages/CartPage/CartPage';
 import { ProductComponent } from '../src/pages/Components/ProductComponentPage';
 import { users, passwords } from '../src/constants/userData';
+import { products } from '../src/constants/products';
 
 test('Cart shows the same price as the catalog', async ({ page }) => {
   const loginPage = new LoginPage(page);
   const inventoryPage = new InventoryPage(page);
   const productComponent = new ProductComponent(page);
-  const title = 'Sauce Labs Bolt T-Shirt';
 
   await page.goto('');
-  await loginPage.login(users.standard, passwords.valid);
+  await loginPage.login({
+    userName: users.standard,
+    password: passwords.valid,
+  });
   const catalogPrice = await productComponent.locators
-    .getPriceLocatorByTitle(title)
+    .getPriceLocatorByTitle(products[1].title)
     .innerText();
-  await productComponent.addToCartByTitle(title);
+  await productComponent.addToCartByTitle(products[1].title);
 
   await inventoryPage.openCart();
   await expect(
-    productComponent.locators.getPriceLocatorByTitle(title),
+    productComponent.locators.getPriceLocatorByTitle(products[1].title),
   ).toHaveText(catalogPrice);
 });
 
@@ -29,11 +32,13 @@ test('Return from cart to catalog', async ({ page }) => {
   const inventoryPage = new InventoryPage(page);
   const cartPage = new CartPage(page);
   const productComponent = new ProductComponent(page);
-  const title = 'Sauce Labs Bike Light';
 
   await page.goto('');
-  await loginPage.login(users.standard, passwords.valid);
-  await productComponent.addToCartByTitle(title);
+  await loginPage.login({
+    userName: users.standard,
+    password: passwords.valid,
+  });
+  await productComponent.addToCartByTitle(products[1].title);
   await inventoryPage.openCart();
   await cartPage.continueShopping();
 

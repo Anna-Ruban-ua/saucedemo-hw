@@ -8,6 +8,9 @@ test('Standard user lands on the catalog after login', async ({ page }) => {
   const inventoryPage = new InventoryPage(page);
 
   await page.goto('');
-  await loginPage.login(users.standard, passwords.valid);
+  await loginPage.login({
+    userName: users.standard,
+    password: passwords.valid,
+  });
   await expect(inventoryPage.locators.inventoryContainer).toBeVisible();
 });
