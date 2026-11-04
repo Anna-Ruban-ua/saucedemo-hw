@@ -50,6 +50,6 @@ test.describe('Problem user', () => {
     await checkoutStepOnePage.fillUserData(user);
     await checkoutStepOnePage.continue();
 
-    expect(checkoutStepTwoPage.locators.finishButton).toBeDisabled;
+    expect(checkoutStepTwoPage.locators.finishButton).not.toBeVisible();
   });
 });
