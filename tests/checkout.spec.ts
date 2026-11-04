@@ -6,8 +6,9 @@ import { CheckoutStepOnePage } from '../src/pages/CheckoutStepOnePage/CheckoutSt
 import { CheckoutStepTwoPage } from '../src/pages/CheckoutStepTwoPage/CheckoutStepTwoPage';
 import { CheckoutCompletePage } from '../src/pages/CheckoutCompletePage/CheckoutCompletePage';
 import { ProductComponent } from '../src/pages/Components/ProductComponentPage';
-
-import { users, passwords, newUserData } from '../src/constants/userData';
+import { users, passwords } from '../src/constants/userData';
+import { newUserData } from '../src/utils/emailGenerator';
+import { products } from '../src/constants/products';
 
 test('Order summary keeps the catalog price and the order completes', async ({
   page,
@@ -19,13 +20,17 @@ test('Order summary keeps the catalog price and the order completes', async ({
   const checkoutCompletePage = new CheckoutCompletePage(page);
   const productComponent = new ProductComponent(page);
   const cartPage = new CartPage(page);
-  const title = 'Sauce Labs Onesie';
 
   await page.goto('');
-  await loginPage.login(users.standard, passwords.valid);
+  await loginPage.login({
+    userName: users.standard,
+    password: passwords.valid,
+  });
 
-  const catalogPrice = await productComponent.locators.getPriceLocatorByTitle(title).innerText();
-  await productComponent.addToCartByTitle(title);
+  const catalogPrice = await productComponent.locators
+    .getPriceLocatorByTitle(products[2].title)
+    .innerText();
+  await productComponent.addToCartByTitle(products[2].title);
   await inventoryPage.openCart();
   await cartPage.checkout();
 
@@ -33,9 +38,9 @@ test('Order summary keeps the catalog price and the order completes', async ({
   await checkoutStepOnePage.fillUserData(user);
   await checkoutStepOnePage.continue();
 
-  await expect(productComponent.locators.getPriceLocatorByTitle(title)).toHaveText(
-    catalogPrice,
-  );
+  await expect(
+    productComponent.locators.getPriceLocatorByTitle(products[2].title),
+  ).toHaveText(catalogPrice);
   expect(await checkoutStepTwoPage.getItemsTotal()).toContain(catalogPrice);
 
   await checkoutStepTwoPage.finish();
